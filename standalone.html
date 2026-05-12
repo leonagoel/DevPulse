@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DevPulse — Developer Productivity Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
+  <script src="https://unpkg.com/recharts@2.10.3/umd/Recharts.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-font-smoothing: antialiased; }
+    body { background: #0a0b0f; color: #fff; font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+
+    /* Utility classes */
+    .flex { display: flex; } .items-center { align-items: center; } .justify-between { justify-content: space-between; }
+    .justify-center { justify-content: center; } .flex-wrap { flex-wrap: wrap; } .flex-1 { flex: 1; }
+    .grid { display: grid; } .gap-1 { gap: 4px; } .gap-2 { gap: 8px; } .gap-3 { gap: 12px; } .gap-4 { gap: 16px; } .gap-6 { gap: 24px; }
+    .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+    .grid-cols-5 { grid-template-columns: repeat(5, 1fr); }
+    @media (max-width: 900px) {
+      .lg\:grid-cols-3 { grid-template-columns: 1fr !important; }
+      .lg\:grid-cols-4 { grid-template-columns: repeat(2, 1fr) !important; }
+      .lg\:grid-cols-5 { grid-template-columns: repeat(2, 1fr) !important; }
+      .lg\:grid-cols-2 { grid-template-columns: 1fr !important; }
+    }
+    @media (min-width: 901px) {
+      .lg\:grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+      .lg\:grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+      .lg\:grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+      .lg\:grid-cols-5 { grid-template-columns: repeat(5, 1fr); }
+    }
+    .p-1 { padding: 4px; } .p-2 { padding: 8px; } .p-3 { padding: 12px; } .p-4 { padding: 16px; } .p-5 { padding: 20px; } .p-6 { padding: 24px; }
+    .px-2 { padding-left: 8px; padding-right: 8px; } .px-3 { padding-left: 12px; padding-right: 12px; }
+    .px-4 { padding-left: 16px; padding-right: 16px; } .px-6 { padding-left: 24px; padding-right: 24px; }
+    .py-0\.5 { padding-top: 2px; padding-bottom: 2px; } .py-1 { padding-top: 4px; padding-bottom: 4px; }
+    .py-1\.5 { padding-top: 6px; padding-bottom: 6px; } .py-2 { padding-top: 8px; padding-bottom: 8px; }
+    .py-2\.5 { padding-top: 10px; padding-bottom: 10px; } .py-8 { padding-top: 32px; padding-bottom: 32px; }
+    .mt-0\.5 { margin-top: 2px; } .mt-1 { margin-top: 4px; } .mt-2 { margin-top: 8px; }
+    .mt-3 { margin-top: 12px; } .mt-4 { margin-top: 16px; } .mb-1 { margin-bottom: 4px; }
+    .mb-2 { margin-bottom: 8px; } .mb-3 { margin-bottom: 12px; } .mb-4 { margin-bottom: 16px; }
+    .ml-1 { margin-left: 4px; } .ml-auto { margin-left: auto; }
+    .w-1 { width: 4px; } .w-1\.5 { width: 6px; } .w-2 { width: 8px; } .w-2\.5 { width: 10px; } .w-3 { width: 12px; }
+    .w-4 { width: 16px; } .w-7 { width: 28px; } .w-8 { width: 32px; } .w-10 { width: 40px; } .w-full { width: 100%; }
+    .h-0\.5 { height: 2px; } .h-1 { height: 4px; } .h-1\.5 { height: 6px; } .h-2 { height: 8px; } .h-7 { height: 28px; }
+    .h-8 { height: 32px; } .h-10 { height: 40px; } .h-16 { height: 64px; } .min-h-screen { min-height: 100vh; }
+    .min-w-0 { min-width: 0; } .max-w-7xl { max-width: 80rem; } .mx-auto { margin-left: auto; margin-right: auto; }
+    .text-xs { font-size: 11px; line-height: 1.5; } .text-sm { font-size: 13px; line-height: 1.5; }
+    .text-lg { font-size: 18px; } .text-xl { font-size: 20px; } .text-2xl { font-size: 24px; } .text-3xl { font-size: 30px; }
+    .font-medium { font-weight: 500; } .font-600 { font-weight: 600; } .font-700 { font-weight: 700; } .font-800 { font-weight: 800; }
+    .font-display { font-family: 'Syne', sans-serif; }
+    .font-body { font-family: 'DM Sans', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .tracking-tight { letter-spacing: -0.025em; } .tracking-wider { letter-spacing: 0.05em; }
+    .uppercase { text-transform: uppercase; }
+    .leading-relaxed { line-height: 1.625; }
+    .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .shrink-0 { flex-shrink: 0; }
+    .relative { position: relative; } .absolute { position: absolute; } .fixed { position: fixed; } .sticky { position: sticky; }
+    .inset-0 { top: 0; right: 0; bottom: 0; left: 0; } .top-0 { top: 0; } .top-full { top: 100%; } .right-0 { right: 0; }
+    .z-10 { z-index: 10; } .z-50 { z-index: 50; }
+    .overflow-hidden { overflow: hidden; } .overflow-y-auto { overflow-y: auto; }
+    .rounded-lg { border-radius: 8px; } .rounded-xl { border-radius: 12px; } .rounded-2xl { border-radius: 16px; }
+    .rounded-full { border-radius: 9999px; } .rounded-md { border-radius: 6px; }
+    .border { border-width: 1px; border-style: solid; } .border-t { border-top-width: 1px; border-top-style: solid; }
+    .border-none { border: none; }
+    .shadow-2xl { box-shadow: 0 25px 50px rgba(0,0,0,0.5); } .shadow-sm { box-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+    .pointer-events-none { pointer-events: none; } .cursor-pointer { cursor: pointer; }
+    .outline-none { outline: none; }
+    .transition-all { transition: all 0.2s ease; } .transition-opacity { transition: opacity 0.2s ease; }
+    .transition-colors { transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease; }
+    .opacity-0 { opacity: 0; } .opacity-100 { opacity: 1; }
+    .text-white { color: #fff; } .text-center { text-align: center; }
+    .blur-3xl { filter: blur(64px); }
+    .backdrop-blur-xl { backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
+    .space-y-2 > * + * { margin-top: 8px; }
+    .space-y-3 > * + * { margin-top: 12px; }
+    .space-y-6 > * + * { margin-top: 24px; }
+    .items-start { align-items: flex-start; } .items-baseline { align-items: baseline; }
+
+    /* Custom colors */
+    .bg-\[\#0a0b0f\] { background: #0a0b0f; }
+    .bg-\[\#13141a\] { background: #13141a; }
+    .text-violet-400 { color: #a78bfa; } .text-cyan-400 { color: #22d3ee; }
+    .text-red-400 { color: #f87171; } .text-emerald-400 { color: #34d399; }
+    .text-amber-400 { color: #fbbf24; } .text-green-400 { color: #4ade80; }
+    .text-green-300 { color: #86efac; } .text-amber-300 { color: #fcd34d; }
+    .text-red-300 { color: #fca5a5; } .text-violet-300 { color: #c4b5fd; }
+
+    /* Opacity text */
+    .text-white\/80 { color: rgba(255,255,255,0.8); }
+    .text-white\/70 { color: rgba(255,255,255,0.7); }
+    .text-white\/60 { color: rgba(255,255,255,0.6); }
+    .text-white\/50 { color: rgba(255,255,255,0.5); }
+    .text-white\/40 { color: rgba(255,255,255,0.4); }
+    .text-white\/35 { color: rgba(255,255,255,0.35); }
+    .text-white\/30 { color: rgba(255,255,255,0.3); }
+    .text-white\/25 { color: rgba(255,255,255,0.25); }
+    .text-white\/20 { color: rgba(255,255,255,0.2); }
+
+    /* Backgrounds */
+    .bg-white\/5 { background: rgba(255,255,255,0.05); }
+    .bg-white\/8 { background: rgba(255,255,255,0.08); }
+    .bg-white\/10 { background: rgba(255,255,255,0.10); }
+    .bg-green-500\/10 { background: rgba(34,197,94,0.10); }
+    .bg-green-500\/15 { background: rgba(34,197,94,0.15); }
+    .bg-amber-500\/10 { background: rgba(245,158,11,0.10); }
+    .bg-amber-500\/15 { background: rgba(245,158,11,0.15); }
+    .bg-red-500\/10 { background: rgba(239,68,68,0.10); }
+    .bg-red-500\/15 { background: rgba(239,68,68,0.15); }
+    .bg-violet-500\/10 { background: rgba(139,92,246,0.10); }
+    .bg-violet-500\/15 { background: rgba(139,92,246,0.15); }
+    .bg-violet-500\/5 { background: rgba(139,92,246,0.05); }
+    .bg-cyan-500\/15 { background: rgba(6,182,212,0.15); }
+    .bg-emerald-500\/15 { background: rgba(52,211,153,0.15); }
+    .bg-amber-500\/5 { background: rgba(245,158,11,0.05); }
+
+    /* Borders */
+    .border-white\/5 { border-color: rgba(255,255,255,0.05); }
+    .border-white\/6 { border-color: rgba(255,255,255,0.06); }
+    .border-white\/8 { border-color: rgba(255,255,255,0.08); }
+    .border-white\/10 { border-color: rgba(255,255,255,0.10); }
+    .border-white\/12 { border-color: rgba(255,255,255,0.12); }
+    .border-green-500\/20 { border-color: rgba(34,197,94,0.20); }
+    .border-green-500\/30 { border-color: rgba(34,197,94,0.30); }
+    .border-amber-500\/20 { border-color: rgba(245,158,11,0.20); }
+    .border-amber-500\/30 { border-color: rgba(245,158,11,0.30); }
+    .border-red-500\/20 { border-color: rgba(239,68,68,0.20); }
+    .border-red-500\/30 { border-color: rgba(239,68,68,0.30); }
+    .border-violet-500\/15 { border-color: rgba(139,92,246,0.15); }
+    .border-amber-500\/15 { border-color: rgba(245,158,11,0.15); }
+
+    /* Hover states */
+    button { background: none; border: none; color: inherit; font: inherit; cursor: pointer; }
+    select { color: inherit; font: inherit; }
+
+    /* BG opacity helpers */
+    .bg-\[rgba\(255\,255\,255\,0\.02\)\] { background: rgba(255,255,255,0.02); }
+    .bg-\[rgba\(255\,255\,255\,0\.03\)\] { background: rgba(255,255,255,0.03); }
+    .bg-\[rgba\(255\,255\,255\,0\.04\)\] { background: rgba(255,255,255,0.04); }
+
+    /* Pulse animation */
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+    .animate-pulse { animation: pulse 2s cubic-bezier(0.4,0,0.6,1) infinite; }
+
+    /* Gradient */
+    .from-violet-500 { --tw-gradient-from: #8b5cf6; }
+    .to-cyan-500 { --tw-gradient-to: #06b6d4; }
+    .bg-gradient-to-br { background-image: linear-gradient(135deg, var(--tw-gradient-from), var(--tw-gradient-to)); }
+    .from-violet-500\/50 { --tw-gradient-from: rgba(139,92,246,0.5); }
+    .to-cyan-500\/50 { --tw-gradient-to: rgba(6,182,212,0.5); }
+    .from-violet-500\/60 { --tw-gradient-from: rgba(139,92,246,0.6); }
+    .to-cyan-500\/60 { --tw-gradient-to: rgba(6,182,212,0.6); }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+// Safety check — show clear error if Recharts failed to load
+if (typeof window.Recharts === 'undefined') {
+  document.getElementById('root').innerHTML =
+    '<div style="color:#f87171;font-family:monospace;padding:40px;font-size:14px">' +
+    '⚠️ Recharts failed to load. Check your internet connection and reload the page.</div>';
+  throw new Error('Recharts not loaded');
+}
+
+const { useState, useEffect, useRef } = React;
+const {
+  RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer,
+  BarChart, Bar, XAxis, YAxis, Tooltip, LineChart, Line, CartesianGrid,
+  ScatterChart, Scatter, Cell
+} = window.Recharts;
+
+// ─── DATA ────────────────────────────────────────────────────────────────────
+
+const developers = [
+  { id:'DEV-001', name:'Ananya Sharma',  manager:'Rina Kapoor', team:'Payments API',  service:'backend',  level:'SDE2', avatar:'AS' },
+  { id:'DEV-002', name:'Rohan Verma',    manager:'Rina Kapoor', team:'Payments API',  service:'backend',  level:'SDE1', avatar:'RV' },
+  { id:'DEV-006', name:'Ishan Mehta',    manager:'Rina Kapoor', team:'Payments API',  service:'backend',  level:'SDE3', avatar:'IM' },
+  { id:'DEV-003', name:'Meera Iyer',     manager:'Samir Gupta', team:'Checkout Web',  service:'frontend', level:'SDE1', avatar:'MI' },
+  { id:'DEV-004', name:'Lakshay Reddy',  manager:'Samir Gupta', team:'Checkout Web',  service:'frontend', level:'SDE2', avatar:'LR' },
+  { id:'DEV-008', name:'Zara Khan',      manager:'Samir Gupta', team:'Checkout Web',  service:'frontend', level:'SDE1', avatar:'ZK' },
+  { id:'DEV-005', name:'Esha Rao',       manager:'Priya Nair',  team:'Mobile Growth', service:'mobile',   level:'SDE1', avatar:'ER' },
+  { id:'DEV-007', name:'Om Prakash',     manager:'Priya Nair',  team:'Mobile Growth', service:'mobile',   level:'SDE2', avatar:'OP' },
+];
+
+const allMetrics = [
+  {devId:'DEV-001',month:'2026-03',issuesDone:2,mergedPRs:2,prodDeployments:2,escapedBugs:0,avgCycleTime:3.95,avgLeadTime:2.40,bugRate:0.00,pattern:'healthy'},
+  {devId:'DEV-001',month:'2026-04',issuesDone:2,mergedPRs:2,prodDeployments:2,escapedBugs:0,avgCycleTime:3.90,avgLeadTime:3.35,bugRate:0.00,pattern:'healthy'},
+  {devId:'DEV-002',month:'2026-03',issuesDone:2,mergedPRs:2,prodDeployments:2,escapedBugs:0,avgCycleTime:5.90,avgLeadTime:4.30,bugRate:0.00,pattern:'healthy'},
+  {devId:'DEV-002',month:'2026-04',issuesDone:2,mergedPRs:2,prodDeployments:2,escapedBugs:1,avgCycleTime:5.40,avgLeadTime:3.75,bugRate:0.50,pattern:'quality_watch'},
+  {devId:'DEV-006',month:'2026-03',issuesDone:2,mergedPRs:2,prodDeployments:2,escapedBugs:0,avgCycleTime:3.75,avgLeadTime:2.35,bugRate:0.00,pattern:'healthy'},
+  {devId:'DEV-006',month:'2026-04',issuesDone:2,mergedPRs:2,prodDeployments:2,escapedBugs:1,avgCycleTime:3.70,avgLeadTime:2.35,bugRate:0.50,pattern:'quality_watch'},
+  {devId:'DEV-003',month:'2026-03',issuesDone:2,mergedPRs:2,prodDeployments:2,escapedBugs:1,avgCycleTime:4.05,avgLeadTime:3.85,bugRate:0.50,pattern:'quality_watch'},
+  {devId:'DEV-003',month:'2026-04',issuesDone:2,mergedPRs:2,prodDeployments:2,escapedBugs:0,avgCycleTime:3.05,avgLeadTime:3.55,bugRate:0.00,pattern:'healthy'},
+  {devId:'DEV-004',month:'2026-03',issuesDone:2,mergedPRs:2,prodDeployments:2,escapedBugs:0,avgCycleTime:3.85,avgLeadTime:2.10,bugRate:0.00,pattern:'healthy'},
+  {devId:'DEV-004',month:'2026-04',issuesDone:2,mergedPRs:2,prodDeployments:2,escapedBugs:0,avgCycleTime:3.55,avgLeadTime:2.90,bugRate:0.00,pattern:'healthy'},
+  {devId:'DEV-008',month:'2026-03',issuesDone:2,mergedPRs:2,prodDeployments:2,escapedBugs:0,avgCycleTime:3.80,avgLeadTime:3.15,bugRate:0.00,pattern:'healthy'},
+  {devId:'DEV-008',month:'2026-04',issuesDone:2,mergedPRs:2,prodDeployments:2,escapedBugs:1,avgCycleTime:3.85,avgLeadTime:3.40,bugRate:0.50,pattern:'quality_watch'},
+  {devId:'DEV-005',month:'2026-03',issuesDone:2,mergedPRs:2,prodDeployments:2,escapedBugs:1,avgCycleTime:5.95,avgLeadTime:4.95,bugRate:0.50,pattern:'quality_watch'},
+  {devId:'DEV-005',month:'2026-04',issuesDone:2,mergedPRs:2,prodDeployments:2,escapedBugs:0,avgCycleTime:6.50,avgLeadTime:4.70,bugRate:0.00,pattern:'needs_review'},
+  {devId:'DEV-007',month:'2026-03',issuesDone:2,mergedPRs:2,prodDeployments:2,escapedBugs:1,avgCycleTime:4.55,avgLeadTime:4.30,bugRate:0.50,pattern:'quality_watch'},
+  {devId:'DEV-007',month:'2026-04',issuesDone:2,mergedPRs:2,prodDeployments:2,escapedBugs:0,avgCycleTime:4.80,avgLeadTime:3.65,bugRate:0.00,pattern:'healthy'},
+];
+
+const allPRs = [
+  {id:'PR-001',devId:'DEV-001',month:'2026-03',reviewWaitHrs:10.5,mergeTimeHrs:34.5,linesChanged:209,reviewRounds:3},
+  {id:'PR-002',devId:'DEV-001',month:'2026-03',reviewWaitHrs:14.6,mergeTimeHrs:27.6,linesChanged:468,reviewRounds:2},
+  {id:'PR-003',devId:'DEV-001',month:'2026-04',reviewWaitHrs:11.0,mergeTimeHrs:31.0,linesChanged:247,reviewRounds:2},
+  {id:'PR-004',devId:'DEV-001',month:'2026-04',reviewWaitHrs: 9.6,mergeTimeHrs:18.6,linesChanged:509,reviewRounds:2},
+  {id:'PR-005',devId:'DEV-002',month:'2026-03',reviewWaitHrs:26.7,mergeTimeHrs:45.7,linesChanged:287,reviewRounds:2},
+  {id:'PR-006',devId:'DEV-002',month:'2026-03',reviewWaitHrs:13.2,mergeTimeHrs:22.2,linesChanged:154,reviewRounds:2},
+  {id:'PR-007',devId:'DEV-002',month:'2026-04',reviewWaitHrs:28.4,mergeTimeHrs:52.4,linesChanged:341,reviewRounds:3},
+  {id:'PR-008',devId:'DEV-002',month:'2026-04',reviewWaitHrs:19.1,mergeTimeHrs:38.1,linesChanged:198,reviewRounds:2},
+  {id:'PR-009',devId:'DEV-006',month:'2026-03',reviewWaitHrs: 8.3,mergeTimeHrs:20.3,linesChanged:187,reviewRounds:1},
+  {id:'PR-010',devId:'DEV-006',month:'2026-04',reviewWaitHrs: 7.9,mergeTimeHrs:17.9,linesChanged:223,reviewRounds:2},
+  {id:'PR-011',devId:'DEV-003',month:'2026-03',reviewWaitHrs:15.4,mergeTimeHrs:40.4,linesChanged:312,reviewRounds:3},
+  {id:'PR-012',devId:'DEV-003',month:'2026-04',reviewWaitHrs:12.2,mergeTimeHrs:29.2,linesChanged:178,reviewRounds:2},
+  {id:'PR-013',devId:'DEV-004',month:'2026-03',reviewWaitHrs: 9.1,mergeTimeHrs:21.1,linesChanged:156,reviewRounds:1},
+  {id:'PR-014',devId:'DEV-004',month:'2026-04',reviewWaitHrs:11.3,mergeTimeHrs:25.3,linesChanged:289,reviewRounds:2},
+  {id:'PR-015',devId:'DEV-008',month:'2026-03',reviewWaitHrs:13.7,mergeTimeHrs:33.7,linesChanged:201,reviewRounds:2},
+  {id:'PR-016',devId:'DEV-008',month:'2026-04',reviewWaitHrs:16.8,mergeTimeHrs:41.8,linesChanged:377,reviewRounds:3},
+  {id:'PR-017',devId:'DEV-005',month:'2026-03',reviewWaitHrs:22.4,mergeTimeHrs:58.4,linesChanged:421,reviewRounds:3},
+  {id:'PR-018',devId:'DEV-005',month:'2026-04',reviewWaitHrs:19.6,mergeTimeHrs:62.6,linesChanged:387,reviewRounds:4},
+  {id:'PR-019',devId:'DEV-007',month:'2026-03',reviewWaitHrs:17.9,mergeTimeHrs:44.9,linesChanged:263,reviewRounds:3},
+  {id:'PR-020',devId:'DEV-007',month:'2026-04',reviewWaitHrs:14.1,mergeTimeHrs:37.1,linesChanged:198,reviewRounds:2},
+];
+
+const allBugs = [
+  {id:'BUG-001',devId:'DEV-002',month:'2026-04',severity:'medium',rootCause:'test gap'},
+  {id:'BUG-002',devId:'DEV-006',month:'2026-04',severity:'low',rootCause:'release config'},
+  {id:'BUG-003',devId:'DEV-008',month:'2026-04',severity:'high',rootCause:'edge case'},
+  {id:'BUG-004',devId:'DEV-003',month:'2026-03',severity:'medium',rootCause:'edge case'},
+  {id:'BUG-005',devId:'DEV-005',month:'2026-03',severity:'medium',rootCause:'test gap'},
+  {id:'BUG-006',devId:'DEV-007',month:'2026-03',severity:'low',rootCause:'release config'},
+];
+
+const MONTHS = ['2026-03','2026-04'];
+const MONTH_LABELS = {'2026-03':'March 2026','2026-04':'April 2026'};
+const PATTERNS = {
+  healthy:       {label:'Healthy Flow',  color:'#22c55e', bg:'rgba(34,197,94,0.10)',   border:'rgba(34,197,94,0.30)',   text:'#4ade80'},
+  quality_watch: {label:'Quality Watch', color:'#f59e0b', bg:'rgba(245,158,11,0.10)',  border:'rgba(245,158,11,0.30)',  text:'#fbbf24'},
+  needs_review:  {label:'Needs Review',  color:'#ef4444', bg:'rgba(239,68,68,0.10)',   border:'rgba(239,68,68,0.30)',   text:'#f87171'},
+};
+const TEAM_COLORS = {'Payments API':'#8b5cf6','Checkout Web':'#06b6d4','Mobile Growth':'#f59e0b'};
+const benchmarks = {avgCycleTime:4.3,avgLeadTime:3.4};
+
+function interpretMetrics(m) {
+  const insights=[], actions=[];
+  if(m.avgCycleTime>5.5){
+    insights.push({type:'warning',text:`Cycle time of ${m.avgCycleTime.toFixed(1)}d is above team avg (${benchmarks.avgCycleTime}d). Work is spending longer from start to done — consider breaking issues into smaller chunks.`});
+    actions.push({icon:'🔍',text:'Break next issues into <3d scope. Smaller, focused tasks ship faster and are easier to review.'});
+  } else if(m.avgCycleTime<3.5){
+    insights.push({type:'positive',text:`Cycle time of ${m.avgCycleTime.toFixed(1)}d is well below team average. Fast, focused delivery — great execution.`});
+  } else {
+    insights.push({type:'neutral',text:`Cycle time of ${m.avgCycleTime.toFixed(1)}d is close to team average — steady execution cadence.`});
+  }
+  if(m.avgLeadTime>4.5){
+    insights.push({type:'warning',text:`Lead time of ${m.avgLeadTime.toFixed(1)}d suggests PRs are queuing in review or CI/CD before reaching production.`});
+    actions.push({icon:'⚡',text:'Ping reviewers proactively after 8h of no review. Keep PRs focused (<300 lines) to speed up review cycles.'});
+  } else {
+    insights.push({type:'positive',text:`Lead time of ${m.avgLeadTime.toFixed(1)}d — healthy PR-to-production pipeline.`});
+  }
+  if(m.bugRate>0.3){
+    insights.push({type:'warning',text:`Bug rate of ${(m.bugRate*100).toFixed(0)}% means ~1 in 2 shipped issues had a production defect this month.`});
+    actions.push({icon:'🧪',text:'Add edge-case tests before merging. A quick pre-merge checklist catches config issues, null inputs, and race conditions early.'});
+    actions.push({icon:'🤝',text:'Consider pairing with a senior reviewer on your next PR to surface blind spots early.'});
+  } else if(m.bugRate===0){
+    insights.push({type:'positive',text:'Zero escaped bugs this month — excellent quality discipline.'});
+  }
+  insights.push({type:'neutral',text:`${m.prodDeployments} production deployment${m.prodDeployments>1?'s':''} — consistent shipping cadence.`});
+  if(actions.length===0){
+    actions.push({icon:'🎯',text:'Maintain PR size and test coverage to stay in healthy flow.'});
+    actions.push({icon:'📈',text:'Consider taking on a stretch goal or mentoring a teammate this month.'});
+  }
+  return {insights,actions};
+}
+
+// ─── COMPONENTS ──────────────────────────────────────────────────────────────
+
+function Avatar({dev, size=32}){
+  return (
+    <div style={{
+      width:size, height:size, borderRadius:size*0.3,
+      background:'linear-gradient(135deg, rgba(139,92,246,0.7), rgba(6,182,212,0.7))',
+      display:'flex', alignItems:'center', justifyContent:'center',
+      fontSize:size*0.35, fontFamily:'Syne,sans-serif', fontWeight:700, flexShrink:0,
+    }}>{dev.avatar}</div>
+  );
+}
+
+function PatternBadge({pattern}){
+  const p=PATTERNS[pattern];
+  return (
+    <span style={{
+      padding:'4px 10px', borderRadius:9999, fontSize:11, fontWeight:600,
+      background:p.bg, border:`1px solid ${p.border}`, color:p.text,
+    }}>{p.label}</span>
+  );
+}
+
+function MetricCard({label, value, unit, prev, benchmark, iconSvg, accentColor, description}){
+  const delta = prev !== undefined ? (typeof value==='number' ? value-prev : null) : null;
+  const isGoodDown = ['Cycle Time','Lead Time','Bug Rate'].includes(label);
+  const deltaGood = delta!==null ? (isGoodDown ? delta<0 : delta>0) : null;
+  const vs = benchmark!==undefined && typeof value==='number' ? value-benchmark : null;
+  const vsGood = vs!==null ? (isGoodDown ? vs<0 : vs>0) : null;
+  return (
+    <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:16,padding:20,transition:'all 0.2s'}}>
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2">
+          <div style={{width:30,height:30,borderRadius:8,background:`${accentColor}22`,display:'flex',alignItems:'center',justifyContent:'center',color:accentColor,fontSize:14}}>
+            {iconSvg}
+          </div>
+          <span style={{fontSize:10,color:'rgba(255,255,255,0.5)',textTransform:'uppercase',letterSpacing:'0.06em',fontWeight:500}}>{label}</span>
+        </div>
+        {delta!==null && (
+          <span style={{
+            fontSize:10,padding:'3px 8px',borderRadius:999,
+            background: delta===0?'rgba(255,255,255,0.05)': deltaGood?'rgba(34,197,94,0.1)':'rgba(239,68,68,0.1)',
+            color: delta===0?'rgba(255,255,255,0.4)': deltaGood?'#4ade80':'#f87171',
+          }}>
+            {delta===0?'same':((delta>0?'+':'')+Math.abs(delta).toFixed(1))}
+          </span>
+        )}
+      </div>
+      <div className="flex items-baseline gap-2 mb-1">
+        <span style={{fontSize:28,fontFamily:'Syne,sans-serif',fontWeight:700,letterSpacing:'-0.02em'}}>{value}</span>
+        <span style={{fontSize:12,color:'rgba(255,255,255,0.4)'}}>{unit}</span>
+      </div>
+      <p style={{fontSize:11,color:'rgba(255,255,255,0.35)',lineHeight:1.5}}>{description}</p>
+      {vs!==null && (
+        <div style={{marginTop:8,fontSize:11,color: vsGood?'rgba(74,222,128,0.7)': vs===0?'rgba(255,255,255,0.3)':'rgba(251,191,36,0.7)',display:'flex',alignItems:'center',gap:6}}>
+          <div style={{width:5,height:5,borderRadius:'50%',background:'currentColor'}}/>
+          {vs===0?'At team avg':`${vsGood?'':'+'}${vs.toFixed(1)} vs team avg`}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function InsightTag({type,text}){
+  const styles={
+    positive:{bg:'rgba(34,197,94,0.1)',border:'rgba(34,197,94,0.2)',color:'rgba(134,239,172,0.9)',icon:'✓'},
+    warning: {bg:'rgba(245,158,11,0.1)',border:'rgba(245,158,11,0.2)',color:'rgba(253,211,77,0.9)',icon:'⚠'},
+    neutral: {bg:'rgba(255,255,255,0.04)',border:'rgba(255,255,255,0.08)',color:'rgba(255,255,255,0.6)',icon:'→'},
+  };
+  const s=styles[type];
+  return (
+    <div style={{display:'flex',gap:12,padding:'12px 14px',borderRadius:12,border:`1px solid ${s.border}`,background:s.bg,color:s.color,fontSize:13,lineHeight:1.6}}>
+      <span style={{fontFamily:'monospace',fontSize:11,marginTop:2,flexShrink:0}}>{s.icon}</span>
+      <span>{text}</span>
+    </div>
+  );
+}
+
+// ─── IC VIEW ─────────────────────────────────────────────────────────────────
+
+function ICView({selectedDev, setSelectedDev, selectedMonth, setSelectedMonth}){
+  const [showPicker, setShowPicker] = useState(false);
+  const dev = developers.find(d=>d.id===selectedDev);
+  const m = allMetrics.find(x=>x.devId===selectedDev && x.month===selectedMonth);
+  const prev = allMetrics.find(x=>x.devId===selectedDev && x.month!==selectedMonth);
+  const devPRs = allPRs.filter(p=>p.devId===selectedDev && p.month===selectedMonth);
+  const devBugs = allBugs.filter(b=>b.devId===selectedDev && b.month===selectedMonth);
+  if(!dev||!m) return null;
+  const pattern=PATTERNS[m.pattern];
+  const interp=interpretMetrics(m);
+
+  const normalize=(val,max)=>Math.max(0,Math.min(100,(1-val/max)*100));
+  const radarData=[
+    {metric:'Cycle Time',score:normalize(m.avgCycleTime,8),fullMark:100},
+    {metric:'Lead Time', score:normalize(m.avgLeadTime,7), fullMark:100},
+    {metric:'Quality',   score:m.bugRate===0?100:m.bugRate<=0.25?60:30, fullMark:100},
+    {metric:'Deploys',   score:Math.min(100,m.prodDeployments*50), fullMark:100},
+    {metric:'PR Output', score:Math.min(100,m.mergedPRs*50), fullMark:100},
+  ];
+
+  const trendData = MONTHS.map(mo=>{
+    const d=allMetrics.find(x=>x.devId===selectedDev && x.month===mo);
+    return {month:MONTH_LABELS[mo].slice(0,3), cycleTime:d?.avgCycleTime, leadTime:d?.avgLeadTime};
+  });
+
+  return (
+    <div className="space-y-6">
+      {/* Controls */}
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h1 style={{fontFamily:'Syne,sans-serif',fontSize:24,fontWeight:700,letterSpacing:'-0.02em'}}>Individual Contributor</h1>
+          <p style={{color:'rgba(255,255,255,0.4)',fontSize:13,marginTop:2}}>Metrics · Interpretation · Next Steps</p>
+        </div>
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* Dev picker */}
+          <div style={{position:'relative'}}>
+            <button onClick={()=>setShowPicker(!showPicker)} style={{
+              display:'flex',alignItems:'center',gap:12,padding:'8px 16px',
+              background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.10)',
+              borderRadius:12,cursor:'pointer',color:'#fff',
+            }}>
+              <Avatar dev={dev} size={28}/>
+              <div style={{textAlign:'left'}}>
+                <div style={{fontSize:13,fontWeight:500}}>{dev.name}</div>
+                <div style={{fontSize:11,color:'rgba(255,255,255,0.4)'}}>{dev.level} · {dev.team}</div>
+              </div>
+              <span style={{color:'rgba(255,255,255,0.4)',marginLeft:4,fontSize:10}}>▾</span>
+            </button>
+            {showPicker && (
+              <div style={{
+                position:'absolute',top:'calc(100% + 8px)',right:0,
+                background:'#13141a',border:'1px solid rgba(255,255,255,0.10)',
+                borderRadius:12,zIndex:100,minWidth:240,boxShadow:'0 25px 50px rgba(0,0,0,0.5)',overflow:'hidden'
+              }}>
+                {developers.map(d=>(
+                  <button key={d.id} onClick={()=>{setSelectedDev(d.id);setShowPicker(false);}} style={{
+                    width:'100%',display:'flex',alignItems:'center',gap:12,padding:'10px 16px',
+                    background:d.id===selectedDev?'rgba(255,255,255,0.05)':'transparent',
+                    border:'none',color:'#fff',cursor:'pointer',textAlign:'left',
+                  }}>
+                    <Avatar dev={d} size={30}/>
+                    <div>
+                      <div style={{fontSize:13,fontWeight:500}}>{d.name}</div>
+                      <div style={{fontSize:11,color:'rgba(255,255,255,0.4)'}}>{d.level} · {d.team}</div>
+                    </div>
+                    {d.id===selectedDev && <div style={{marginLeft:'auto',width:6,height:6,borderRadius:'50%',background:'#a78bfa'}}/>}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          {/* Month toggle */}
+          <div style={{display:'flex',gap:4,background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.10)',borderRadius:12,padding:4}}>
+            {MONTHS.map(mo=>(
+              <button key={mo} onClick={()=>setSelectedMonth(mo)} style={{
+                padding:'6px 14px',borderRadius:8,fontSize:13,cursor:'pointer',border:'none',
+                background:mo===selectedMonth?'rgba(255,255,255,0.10)':'transparent',
+                color:mo===selectedMonth?'#fff':'rgba(255,255,255,0.4)',
+              }}>{MONTH_LABELS[mo].slice(0,3)}</button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Pattern banner */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 18px',
+        borderRadius:16,background:pattern.bg,border:`1px solid ${pattern.border}`,flexWrap:'wrap',gap:8}}>
+        <div style={{display:'flex',alignItems:'center',gap:10}}>
+          <div style={{width:10,height:10,borderRadius:'50%',background:pattern.color}}/>
+          <span style={{fontFamily:'Syne,sans-serif',fontWeight:600,color:pattern.text}}>{pattern.label}</span>
+          <span style={{color:'rgba(255,255,255,0.3)',fontSize:13}}>— {MONTH_LABELS[selectedMonth]}</span>
+        </div>
+        <div style={{display:'flex',gap:16,fontSize:13,color:'rgba(255,255,255,0.4)'}}>
+          <span>{dev.team}</span><span>·</span><span>{dev.manager}</span>
+        </div>
+      </div>
+
+      {/* Metrics grid */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:14}}>
+        <MetricCard label="Cycle Time" value={m.avgCycleTime.toFixed(1)} unit="days"
+          prev={prev?.avgCycleTime} benchmark={benchmarks.avgCycleTime}
+          iconSvg="⏱" accentColor="#a78bfa"
+          description="Avg time from In Progress → Done"/>
+        <MetricCard label="Lead Time" value={m.avgLeadTime.toFixed(1)} unit="days"
+          prev={prev?.avgLeadTime} benchmark={benchmarks.avgLeadTime}
+          iconSvg="⚡" accentColor="#22d3ee"
+          description="Avg time from PR open → production"/>
+        <MetricCard label="Bug Rate" value={`${(m.bugRate*100).toFixed(0)}%`} unit=""
+          iconSvg="🐛" accentColor="#f87171"
+          description="Escaped prod bugs / issues done"/>
+        <MetricCard label="PR Throughput" value={m.mergedPRs} unit="merged"
+          iconSvg="🔀" accentColor="#34d399"
+          description="Pull requests merged this month"/>
+        <MetricCard label="Deploy Freq" value={m.prodDeployments} unit="deploys"
+          iconSvg="🚀" accentColor="#fbbf24"
+          description="Successful prod deployments"/>
+      </div>
+
+      {/* Charts row */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',gap:20}}>
+        {/* Radar */}
+        <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:16,padding:24}}>
+          <p style={{fontFamily:'Syne,sans-serif',fontWeight:600,fontSize:11,color:'rgba(255,255,255,0.5)',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:16}}>Performance Radar</p>
+          <ResponsiveContainer width="100%" height={230}>
+            <RadarChart data={radarData}>
+              <PolarGrid stroke="rgba(255,255,255,0.06)"/>
+              <PolarAngleAxis dataKey="metric" tick={{fill:'rgba(255,255,255,0.4)',fontSize:11,fontFamily:'DM Sans'}}/>
+              <Radar name="Score" dataKey="score" stroke={pattern.color} fill={pattern.color} fillOpacity={0.15} strokeWidth={2}/>
+            </RadarChart>
+          </ResponsiveContainer>
+          <p style={{textAlign:'center',fontSize:11,color:'rgba(255,255,255,0.25)',marginTop:4}}>Higher = better for each dimension</p>
+        </div>
+
+        {/* Trend */}
+        <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:16,padding:24}}>
+          <p style={{fontFamily:'Syne,sans-serif',fontWeight:600,fontSize:11,color:'rgba(255,255,255,0.5)',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:16}}>Time Trends</p>
+          <ResponsiveContainer width="100%" height={210}>
+            <LineChart data={trendData} margin={{top:5,right:10,left:-20,bottom:5}}>
+              <CartesianGrid stroke="rgba(255,255,255,0.04)"/>
+              <XAxis dataKey="month" tick={{fill:'rgba(255,255,255,0.4)',fontSize:11}}/>
+              <YAxis tick={{fill:'rgba(255,255,255,0.4)',fontSize:11}}/>
+              <Tooltip contentStyle={{background:'#13141a',border:'1px solid rgba(255,255,255,0.1)',borderRadius:8}}
+                labelStyle={{color:'rgba(255,255,255,0.6)'}} itemStyle={{color:'rgba(255,255,255,0.8)'}}/>
+              <Line type="monotone" dataKey="cycleTime" name="Cycle Time (d)" stroke="#8b5cf6" strokeWidth={2} dot={{r:4,fill:'#8b5cf6'}}/>
+              <Line type="monotone" dataKey="leadTime" name="Lead Time (d)" stroke="#06b6d4" strokeWidth={2} dot={{r:4,fill:'#06b6d4'}}/>
+            </LineChart>
+          </ResponsiveContainer>
+          <div style={{display:'flex',justifyContent:'center',gap:16,marginTop:6}}>
+            <div style={{display:'flex',alignItems:'center',gap:6,fontSize:11,color:'rgba(255,255,255,0.4)'}}>
+              <div style={{width:12,height:2,background:'#8b5cf6',borderRadius:1}}/> Cycle Time
+            </div>
+            <div style={{display:'flex',alignItems:'center',gap:6,fontSize:11,color:'rgba(255,255,255,0.4)'}}>
+              <div style={{width:12,height:2,background:'#06b6d4',borderRadius:1}}/> Lead Time
+            </div>
+          </div>
+        </div>
+
+        {/* PR details */}
+        <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:16,padding:24}}>
+          <p style={{fontFamily:'Syne,sans-serif',fontWeight:600,fontSize:11,color:'rgba(255,255,255,0.5)',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:14}}>PR Activity</p>
+          <div style={{display:'flex',flexDirection:'column',gap:10}}>
+            {devPRs.map(pr=>(
+              <div key={pr.id} style={{background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:10,padding:12}}>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
+                  <span style={{fontFamily:'monospace',fontSize:11,color:'#a78bfa'}}>{pr.id}</span>
+                  <span style={{fontSize:11,color:'rgba(255,255,255,0.3)'}}>{pr.reviewRounds} round{pr.reviewRounds>1?'s':''}</span>
+                </div>
+                <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}}>
+                  {[['Review wait',`${pr.reviewWaitHrs.toFixed(1)}h`,false],
+                    ['Merge time',`${pr.mergeTimeHrs.toFixed(1)}h`,false],
+                    ['Lines',pr.linesChanged,pr.linesChanged>400]].map(([l,v,warn])=>(
+                    <div key={l}>
+                      <div style={{fontSize:10,color:'rgba(255,255,255,0.3)',marginBottom:2}}>{l}</div>
+                      <div style={{fontFamily:'monospace',fontSize:12,color:warn?'#fbbf24':'rgba(255,255,255,0.8)'}}>{v}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          {devBugs.length>0 && (
+            <div style={{marginTop:14,paddingTop:14,borderTop:'1px solid rgba(255,255,255,0.06)'}}>
+              <div style={{fontSize:11,color:'rgba(255,255,255,0.4)',marginBottom:8}}>Escaped Bugs</div>
+              {devBugs.map(b=>(
+                <div key={b.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'6px 0',fontSize:12}}>
+                  <span style={{fontFamily:'monospace',color:'rgba(248,113,113,0.8)'}}>{b.id}</span>
+                  <span style={{color:'rgba(255,255,255,0.4)'}}>{b.rootCause}</span>
+                  <span style={{
+                    padding:'2px 8px',borderRadius:999,fontSize:10,
+                    background:b.severity==='high'?'rgba(239,68,68,0.15)':b.severity==='medium'?'rgba(245,158,11,0.15)':'rgba(255,255,255,0.05)',
+                    color:b.severity==='high'?'#f87171':b.severity==='medium'?'#fbbf24':'rgba(255,255,255,0.4)',
+                  }}>{b.severity}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Interpretation + Next Steps */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))',gap:20}}>
+        <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:16,padding:24}}>
+          <p style={{fontFamily:'Syne,sans-serif',fontWeight:600,fontSize:11,color:'rgba(255,255,255,0.5)',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:14}}>ℹ What the data is saying</p>
+          <div style={{display:'flex',flexDirection:'column',gap:10}}>
+            {interp.insights.map((ins,i)=><InsightTag key={i} type={ins.type} text={ins.text}/>)}
+          </div>
+        </div>
+        <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:16,padding:24}}>
+          <p style={{fontFamily:'Syne,sans-serif',fontWeight:600,fontSize:11,color:'rgba(255,255,255,0.5)',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:14}}>🎯 Suggested next steps</p>
+          <div style={{display:'flex',flexDirection:'column',gap:10}}>
+            {interp.actions.map((act,i)=>(
+              <div key={i} style={{display:'flex',gap:12,padding:'12px 14px',background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:12}}>
+                <span style={{fontSize:18,flexShrink:0}}>{act.icon}</span>
+                <p style={{fontSize:13,color:'rgba(255,255,255,0.7)',lineHeight:1.6}}>{act.text}</p>
+              </div>
+            ))}
+          </div>
+          <div style={{marginTop:14,padding:12,background:'rgba(139,92,246,0.05)',border:'1px solid rgba(139,92,246,0.15)',borderRadius:12}}>
+            <p style={{fontSize:11,color:'rgba(196,181,253,0.6)',lineHeight:1.6}}>
+              <strong style={{color:'rgba(196,181,253,0.8)'}}>Responsible AI note:</strong> These insights are generated from aggregated data. Use them as a starting point for reflection — not as a performance verdict.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── MANAGER VIEW ─────────────────────────────────────────────────────────────
+
+function ManagerView({selectedMonth, setSelectedMonth, setView, setSelectedDev}){
+  const [filterTeam, setFilterTeam] = useState('All');
+  const [sortBy, setSortBy] = useState('cycleTime');
+
+  const monthData = allMetrics.filter(m=>m.month===selectedMonth).map(m=>({
+    ...m, dev:developers.find(d=>d.id===m.devId)
+  })).filter(m=>m.dev);
+
+  const teams=['All',...Array.from(new Set(developers.map(d=>d.team)))];
+  const filtered = filterTeam==='All'?monthData:monthData.filter(m=>m.dev.team===filterTeam);
+  const sorted=[...filtered].sort((a,b)=>{
+    if(sortBy==='cycleTime') return a.avgCycleTime-b.avgCycleTime;
+    if(sortBy==='leadTime') return a.avgLeadTime-b.avgLeadTime;
+    if(sortBy==='bugRate') return a.bugRate-b.bugRate;
+    return b.prodDeployments-a.prodDeployments;
+  });
+
+  const healthy=monthData.filter(m=>m.pattern==='healthy').length;
+  const attention=monthData.filter(m=>m.pattern!=='healthy').length;
+  const avgCycle=(monthData.reduce((s,m)=>s+m.avgCycleTime,0)/monthData.length).toFixed(1);
+  const avgBug=((monthData.reduce((s,m)=>s+m.bugRate,0)/monthData.length)*100).toFixed(0);
+
+  const barData=[...monthData].sort((a,b)=>a.avgCycleTime-b.avgCycleTime).map(m=>({
+    name:m.dev.name.split(' ')[0], cycleTime:m.avgCycleTime, leadTime:m.avgLeadTime, team:m.dev.team
+  }));
+
+  const scatterData=monthData.map(m=>({
+    x:m.avgCycleTime, y:m.avgLeadTime, name:m.dev.name, team:m.dev.team, pattern:m.pattern
+  }));
+
+  const teamRollup=Array.from(new Set(developers.map(d=>d.team))).map(team=>{
+    const tm=monthData.filter(m=>m.dev.team===team);
+    return {team,
+      avgCycle:(tm.reduce((s,m)=>s+m.avgCycleTime,0)/tm.length).toFixed(1),
+      avgLead:(tm.reduce((s,m)=>s+m.avgLeadTime,0)/tm.length).toFixed(1),
+      bugs:tm.reduce((s,m)=>s+m.escapedBugs,0),members:tm.length};
+  });
+
+  const CustomTooltip=({active,payload})=>{
+    if(!active||!payload?.length) return null;
+    const d=payload[0]?.payload;
+    return (<div style={{background:'#13141a',border:'1px solid rgba(255,255,255,0.1)',borderRadius:10,padding:12,fontSize:12}}>
+      <div style={{fontWeight:500,marginBottom:4}}>{d?.name}</div>
+      <div style={{color:'rgba(255,255,255,0.5)'}}>Cycle: {d?.x?.toFixed(1)}d · Lead: {d?.y?.toFixed(1)}d</div>
+      <div style={{marginTop:4,color:TEAM_COLORS[d?.team]}}>{d?.team}</div>
+    </div>);
+  };
+
+  const card=(icon,label,value,sub,color)=>(
+    <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:16,padding:18,display:'flex',alignItems:'center',gap:14}}>
+      <div style={{width:40,height:40,borderRadius:12,background:color,display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,flexShrink:0}}>{icon}</div>
+      <div>
+        <div style={{fontFamily:'Syne,sans-serif',fontSize:22,fontWeight:700,letterSpacing:'-0.02em'}}>{value}</div>
+        <div style={{fontSize:11,color:'rgba(255,255,255,0.4)',marginTop:2}}>{label}</div>
+        {sub && <div style={{fontSize:11,color:'rgba(255,255,255,0.25)',marginTop:1}}>{sub}</div>}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h1 style={{fontFamily:'Syne,sans-serif',fontSize:24,fontWeight:700,letterSpacing:'-0.02em'}}>Manager Overview</h1>
+          <p style={{color:'rgba(255,255,255,0.4)',fontSize:13,marginTop:2}}>Team health · {MONTH_LABELS[selectedMonth]}</p>
+        </div>
+        <div style={{display:'flex',gap:4,background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.10)',borderRadius:12,padding:4}}>
+          {MONTHS.map(mo=>(
+            <button key={mo} onClick={()=>setSelectedMonth(mo)} style={{
+              padding:'6px 14px',borderRadius:8,fontSize:13,border:'none',cursor:'pointer',
+              background:mo===selectedMonth?'rgba(255,255,255,0.10)':'transparent',
+              color:mo===selectedMonth?'#fff':'rgba(255,255,255,0.4)',
+            }}>{MONTH_LABELS[mo].slice(0,3)}</button>
+          ))}
+        </div>
+      </div>
+
+      {/* Summary */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:14}}>
+        {card('✅','Healthy flow',healthy,`of ${monthData.length} devs`,'rgba(34,197,94,0.15)')}
+        {card('⚠️','Need attention',attention,'quality watch + review','rgba(245,158,11,0.15)')}
+        {card('⏱','Avg cycle time',`${avgCycle}d`,`benchmark ${benchmarks.avgCycleTime}d`,'rgba(139,92,246,0.15)')}
+        {card('🐛','Avg bug rate',`${avgBug}%`,'escaped to production','rgba(239,68,68,0.15)')}
+      </div>
+
+      {/* Charts */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))',gap:20}}>
+        <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:16,padding:24}}>
+          <p style={{fontFamily:'Syne,sans-serif',fontWeight:600,fontSize:11,color:'rgba(255,255,255,0.5)',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:16}}>Cycle & Lead Time by Developer</p>
+          <ResponsiveContainer width="100%" height={210}>
+            <BarChart data={barData} margin={{top:0,right:10,left:-20,bottom:0}}>
+              <CartesianGrid stroke="rgba(255,255,255,0.04)" vertical={false}/>
+              <XAxis dataKey="name" tick={{fill:'rgba(255,255,255,0.4)',fontSize:11}}/>
+              <YAxis tick={{fill:'rgba(255,255,255,0.4)',fontSize:11}}/>
+              <Tooltip contentStyle={{background:'#13141a',border:'1px solid rgba(255,255,255,0.1)',borderRadius:8}}
+                labelStyle={{color:'rgba(255,255,255,0.6)'}} itemStyle={{color:'rgba(255,255,255,0.8)'}}/>
+              <Bar dataKey="cycleTime" name="Cycle Time (d)" fill="#8b5cf6" radius={[4,4,0,0]} opacity={0.85}/>
+              <Bar dataKey="leadTime" name="Lead Time (d)" fill="#06b6d4" radius={[4,4,0,0]} opacity={0.85}/>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:16,padding:24}}>
+          <p style={{fontFamily:'Syne,sans-serif',fontWeight:600,fontSize:11,color:'rgba(255,255,255,0.5)',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:4}}>Cycle vs Lead Time</p>
+          <p style={{fontSize:11,color:'rgba(255,255,255,0.3)',marginBottom:14}}>Bottom-left = best performers</p>
+          <ResponsiveContainer width="100%" height={200}>
+            <ScatterChart margin={{top:5,right:10,left:-20,bottom:5}}>
+              <CartesianGrid stroke="rgba(255,255,255,0.04)"/>
+              <XAxis dataKey="x" type="number" domain={[3,7]} name="Cycle Time" tick={{fill:'rgba(255,255,255,0.4)',fontSize:11}}/>
+              <YAxis dataKey="y" type="number" domain={[2,6]} name="Lead Time" tick={{fill:'rgba(255,255,255,0.4)',fontSize:11}}/>
+              <Tooltip content={<CustomTooltip/>}/>
+              <Scatter data={scatterData}>
+                {scatterData.map((e,i)=><Cell key={i} fill={TEAM_COLORS[e.team]||'#8b5cf6'} opacity={0.85}/>)}
+              </Scatter>
+            </ScatterChart>
+          </ResponsiveContainer>
+          <div style={{display:'flex',justifyContent:'center',gap:16,marginTop:6,flexWrap:'wrap'}}>
+            {Object.entries(TEAM_COLORS).map(([t,c])=>(
+              <div key={t} style={{display:'flex',alignItems:'center',gap:6,fontSize:11,color:'rgba(255,255,255,0.4)'}}>
+                <div style={{width:8,height:8,borderRadius:'50%',background:c}}/>{t}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Team rollup */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:14}}>
+        {teamRollup.map(t=>(
+          <div key={t.team} style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:16,padding:20}}>
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:14,alignItems:'center'}}>
+              <span style={{padding:'3px 10px',borderRadius:6,fontSize:11,fontWeight:600,background:`${TEAM_COLORS[t.team]}20`,color:TEAM_COLORS[t.team]}}>{t.team}</span>
+              <span style={{fontSize:11,color:'rgba(255,255,255,0.3)'}}>{t.members} members</span>
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',textAlign:'center',gap:8}}>
+              {[['Avg Cycle',`${t.avgCycle}d`,null],['Avg Lead',`${t.avgLead}d`,null],['Bugs',t.bugs,t.bugs>0?'#fbbf24':'#4ade80']].map(([l,v,c])=>(
+                <div key={l}>
+                  <div style={{fontSize:18,fontFamily:'Syne,sans-serif',fontWeight:700,color:c||'#fff'}}>{v}</div>
+                  <div style={{fontSize:10,color:'rgba(255,255,255,0.3)',marginTop:2}}>{l}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Dev table */}
+      <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:16,padding:24}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16,flexWrap:'wrap',gap:12}}>
+          <p style={{fontFamily:'Syne,sans-serif',fontWeight:600,fontSize:11,color:'rgba(255,255,255,0.5)',textTransform:'uppercase',letterSpacing:'0.06em'}}>Developer Breakdown</p>
+          <div style={{display:'flex',gap:8,flexWrap:'wrap',alignItems:'center'}}>
+            <div style={{display:'flex',gap:3,background:'rgba(255,255,255,0.04)',padding:3,borderRadius:8}}>
+              {teams.map(t=>(
+                <button key={t} onClick={()=>setFilterTeam(t)} style={{
+                  padding:'4px 10px',borderRadius:6,fontSize:11,border:'none',cursor:'pointer',
+                  background:filterTeam===t?'rgba(255,255,255,0.10)':'transparent',
+                  color:filterTeam===t?'#fff':'rgba(255,255,255,0.4)',
+                }}>{t==='All'?'All':t.split(' ')[0]}</button>
+              ))}
+            </div>
+            <select value={sortBy} onChange={e=>setSortBy(e.target.value)} style={{
+              background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.10)',
+              borderRadius:8,padding:'5px 10px',fontSize:11,color:'rgba(255,255,255,0.7)',cursor:'pointer',outline:'none',
+            }}>
+              <option value="cycleTime">Cycle Time ↑</option>
+              <option value="leadTime">Lead Time ↑</option>
+              <option value="bugRate">Bug Rate ↑</option>
+              <option value="deployFreq">Deploys ↓</option>
+            </select>
+          </div>
+        </div>
+        <div style={{display:'flex',flexDirection:'column',gap:8}}>
+          {sorted.map((m,i)=>(
+            <div key={m.devId} style={{
+              display:'flex',alignItems:'center',gap:12,padding:'12px 14px',
+              background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.06)',
+              borderRadius:12,flexWrap:'wrap',gap:10,
+            }}>
+              <span style={{color:'rgba(255,255,255,0.2)',fontFamily:'monospace',fontSize:11,width:16,flexShrink:0}}>{i+1}</span>
+              <Avatar dev={m.dev} size={32}/>
+              <div style={{flex:1,minWidth:120}}>
+                <div style={{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap',marginBottom:6}}>
+                  <span style={{fontSize:13,fontWeight:500}}>{m.dev.name}</span>
+                  <span style={{fontSize:11,color:'rgba(255,255,255,0.3)'}}>{m.dev.level}</span>
+                  <span style={{padding:'2px 8px',borderRadius:5,fontSize:10,fontWeight:600,
+                    background:`${TEAM_COLORS[m.dev.team]}20`,color:TEAM_COLORS[m.dev.team]}}>{m.dev.team}</span>
+                </div>
+                <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
+                  {[
+                    ['Cycle',`${m.avgCycleTime.toFixed(1)}d`,m.avgCycleTime<4.5],
+                    ['Lead',`${m.avgLeadTime.toFixed(1)}d`,m.avgLeadTime<4],
+                    ['Bug%',`${(m.bugRate*100).toFixed(0)}%`,m.bugRate===0],
+                    ['PRs',m.mergedPRs,null],
+                    ['Deploys',m.prodDeployments,null],
+                  ].map(([l,v,g])=>(
+                    <span key={l} style={{
+                      padding:'3px 8px',borderRadius:6,fontSize:11,
+                      background:g===null?'rgba(255,255,255,0.05)':g?'rgba(34,197,94,0.10)':'rgba(239,68,68,0.10)',
+                      border:`1px solid ${g===null?'rgba(255,255,255,0.08)':g?'rgba(34,197,94,0.20)':'rgba(239,68,68,0.20)'}`,
+                      color:g===null?'rgba(255,255,255,0.5)':g?'rgba(134,239,172,0.9)':'rgba(248,113,113,0.9)',
+                    }}>
+                      <span style={{color:'rgba(255,255,255,0.3)',marginRight:4}}>{l}</span>{v}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div style={{display:'flex',alignItems:'center',gap:8}}>
+                <PatternBadge pattern={m.pattern}/>
+                <button onClick={()=>{setSelectedDev(m.devId);setView('ic');}} title="Open IC view" style={{
+                  padding:'5px 8px',borderRadius:7,background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',
+                  cursor:'pointer',color:'rgba(255,255,255,0.4)',fontSize:11,
+                }}>→ IC</button>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={{marginTop:14,padding:12,background:'rgba(245,158,11,0.05)',border:'1px solid rgba(245,158,11,0.15)',borderRadius:12}}>
+          <p style={{fontSize:11,color:'rgba(253,211,77,0.6)',lineHeight:1.6}}>
+            <strong style={{color:'rgba(253,211,77,0.8)'}}>Manager note:</strong> Rankings are for trend-spotting only — not performance judgement. Context always matters: team complexity, on-call load, and scope differ across individuals.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── ROOT APP ─────────────────────────────────────────────────────────────────
+
+function App(){
+  const [view,setView]=useState('ic');
+  const [selectedDev,setSelectedDev]=useState('DEV-001');
+  const [selectedMonth,setSelectedMonth]=useState('2026-04');
+  const [mounted,setMounted]=useState(false);
+  useEffect(()=>{setTimeout(()=>setMounted(true),50);},[]);
+
+  return (
+    <div style={{minHeight:'100vh',background:'#0a0b0f',color:'#fff',fontFamily:'DM Sans,sans-serif',opacity:mounted?1:0,transition:'opacity 0.5s ease'}}>
+      {/* Ambient glows */}
+      <div style={{position:'fixed',inset:0,pointerEvents:'none',overflow:'hidden',zIndex:0}}>
+        <div style={{position:'absolute',top:0,left:'25%',width:400,height:400,background:'rgba(139,92,246,0.07)',borderRadius:'50%',filter:'blur(80px)'}}/>
+        <div style={{position:'absolute',bottom:'25%',right:'25%',width:300,height:300,background:'rgba(6,182,212,0.05)',borderRadius:'50%',filter:'blur(80px)'}}/>
+      </div>
+
+      {/* Header */}
+      <header style={{position:'sticky',top:0,zIndex:50,borderBottom:'1px solid rgba(255,255,255,0.05)',background:'rgba(10,11,15,0.85)',backdropFilter:'blur(24px)',WebkitBackdropFilter:'blur(24px)'}}>
+        <div style={{maxWidth:1280,margin:'0 auto',padding:'0 24px',height:64,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+          <div style={{display:'flex',alignItems:'center',gap:12}}>
+            <div style={{width:32,height:32,borderRadius:10,background:'linear-gradient(135deg,#8b5cf6,#06b6d4)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:16}}>⚡</div>
+            <span style={{fontFamily:'Syne,sans-serif',fontWeight:800,fontSize:18,letterSpacing:'-0.01em'}}>DevPulse</span>
+            <span style={{fontFamily:'monospace',color:'rgba(255,255,255,0.25)',fontSize:11,marginLeft:2}}>v1.0</span>
+          </div>
+
+          <div style={{display:'flex',gap:4,background:'rgba(255,255,255,0.05)',borderRadius:14,padding:4}}>
+            {[['ic','👤 IC View'],['manager','👥 Manager']].map(([v,l])=>(
+              <button key={v} onClick={()=>setView(v)} style={{
+                display:'flex',alignItems:'center',gap:8,padding:'8px 18px',borderRadius:10,fontSize:13,fontWeight:500,
+                background:view===v?'rgba(255,255,255,0.10)':'transparent',
+                color:view===v?'#fff':'rgba(255,255,255,0.4)',border:'none',cursor:'pointer',transition:'all 0.15s',
+              }}>{l}</button>
+            ))}
+          </div>
+
+          <div style={{display:'flex',alignItems:'center',gap:8}}>
+            <div style={{width:7,height:7,borderRadius:'50%',background:'#4ade80',animation:'pulse 2s infinite'}}/>
+            <span style={{fontFamily:'monospace',color:'rgba(255,255,255,0.3)',fontSize:11}}>LIVE DATA</span>
+          </div>
+        </div>
+      </header>
+
+      {/* Content */}
+      <main style={{maxWidth:1280,margin:'0 auto',padding:'32px 24px',position:'relative',zIndex:1}}>
+        {view==='ic'
+          ? <ICView selectedDev={selectedDev} setSelectedDev={setSelectedDev} selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth}/>
+          : <ManagerView selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} setView={setView} setSelectedDev={setSelectedDev}/>
+        }
+      </main>
+
+      <style>{`
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        button:hover { opacity: 0.85; }
+        * { box-sizing: border-box; }
+      `}</style>
+    </div>
+  );
+}
+
+const root=ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App/>);
+</script>
+</body>
+</html>
