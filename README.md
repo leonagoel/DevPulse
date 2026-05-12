@@ -1,83 +1,141 @@
-# DevPulse — Developer Productivity Intelligence MVP
+<div align="center">
 
-A full-stack MVP that transforms raw engineering metrics into actionable insights for individual contributors and engineering managers.
+<img src="./devpulse-logo.svg" alt="DevPulse" width="600"/>
 
----
+### *Developer Productivity Intelligence · MVP*
 
-## What It Does
+> **From raw metrics to real insight — in one view.**
 
-DevPulse takes raw developer data (PRs, Jira issues, CI/CD deployments, bug reports) and helps users move from **metrics → interpretation → action**.
+[![React](https://img.shields.io/badge/React_18-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev)
+[![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
+[![Recharts](https://img.shields.io/badge/Recharts-FF6B6B?style=for-the-badge&logo=chartdotjs&logoColor=white)](https://recharts.org)
+[![Zero Backend](https://img.shields.io/badge/Zero_Backend_Required-orange?style=for-the-badge&logo=javascript&logoColor=white)](#getting-started)
 
-### Two Views
-
-**IC View (Individual Contributor)**
-- Select any developer and any month
-- See all 5 metrics: Cycle Time, Lead Time, Bug Rate, PR Throughput, Deployment Frequency
-- Radar chart showing multi-dimensional performance profile
-- Month-over-month trend line for cycle & lead time
-- PR detail cards (review wait, merge time, lines changed, review rounds)
-- Bug log with severity and root cause
-- AI-style interpretation: "what the data is saying" in plain English
-- 2–3 suggested next steps tailored to the pattern detected
-
-**Manager View**
-- Team-level summary cards (healthy / attention / avg cycle / avg bug rate)
-- Bar chart: cycle & lead time across all developers
-- Scatter plot: cycle time vs lead time — identify outliers at a glance
-- Team rollup: per-team averages for cycle, lead, and escaped bugs
-- Sortable, filterable developer table with drill-down to IC view
-- Responsible-use note reminding managers that rankings are for trend-spotting, not judgement
+</div>
 
 ---
 
-## Metrics (per assignment spec)
+## 🧠 What It Does
+
+DevPulse ingests raw developer data — PRs, Jira issues, CI/CD deployments, bug reports — and moves users through a clear journey:
+
+```
+metrics  →  interpretation  →  action
+```
+
+No more staring at spreadsheets wondering what they mean.
+
+---
+
+## 🪟 Two Views. One Truth.
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### 👤 IC View — Individual Contributor
+
+Pick any developer + any month and get:
+
+- 5 DORA-backed metrics at a glance
+- Radar chart: multi-dimensional profile
+- Month-over-month trend lines
+- PR detail cards: wait time, merge time, lines, review rounds
+- Bug log with severity & root cause
+- Plain-English interpretation of your pattern
+- 2–3 tailored, specific next steps
+
+</td>
+<td width="50%" valign="top">
+
+### 📊 Manager View — Team Health
+
+Your team's pulse from 30,000 ft:
+
+- Summary cards: healthy / watch / avg cycle / avg bug rate
+- Bar chart: cycle & lead time across all devs
+- Scatter plot: spot outliers instantly
+- Per-team rollup averages
+- Sortable developer table + drill-down to IC view
+- Responsible-use note baked in
+
+</td>
+</tr>
+</table>
+
+---
+
+## 📐 The 5 Metrics
+
+> Chosen based on DORA research. Each one tells a specific slice of the story.
 
 | Metric | Definition |
-|--------|-----------|
-| **Lead Time for Changes** | Average `lead_time_days` from successful prod deployments in the month |
-| **Cycle Time** | Average `cycle_time_days` from Jira issues completed in the month |
-| **Bug Rate** | Escaped prod bugs found in month ÷ issues completed in month |
-| **Deployment Frequency** | Count of successful prod deployments in the month |
-| **PR Throughput** | Count of merged pull requests in the month |
+|---|---|
+| ⚡ **Lead Time** | Avg days from PR open → production deployment |
+| 🔄 **Cycle Time** | Avg days from In Progress → Done in Jira |
+| 🐛 **Bug Rate** | Escaped prod bugs ÷ issues completed |
+| 🚀 **Deploy Frequency** | Count of successful prod deployments |
+| 📬 **PR Throughput** | Count of merged pull requests in the month |
 
 ---
 
-## Data Source
+## 🤖 Interpretation Engine
 
-All data is sourced directly from the provided workbook:  
-`intern_assignment_support_pack_dev_only_v3.xlsx`
+The `interpretMetrics()` function reads each developer's data pattern and generates **human-readable stories** — not just numbers.
 
-Tables used:
-- `Dim_Developers` — developer dimension (name, team, manager, level)
-- `Fact_Jira_Issues` — cycle time, issue types, story points
-- `Fact_Pull_Requests` — PR timing, review rounds, lines changed
-- `Fact_CI_Deployments` — lead time, deployment status
-- `Fact_Bug_Reports` — escaped bugs, severity, root cause
+Three patterns are detected automatically:
 
-Data is pre-processed into `src/data/metrics.js` which acts as the mock API layer.
+```
+✅  Healthy Flow     —  metrics within expected range
+⚠️  Quality Watch   —  elevated bug rate or review churn
+🔴  Needs Review    —  multiple signals outside healthy thresholds
+```
+
+**Threshold logic:**
+
+```
+Cycle Time  > 5.5d  →  Flags slow execution; suggests issue decomposition
+Lead Time   > 4.5d  →  Flags pipeline delay; suggests proactive reviewer pings
+Bug Rate    > 30%   →  Flags quality risk; suggests edge-case testing & pair review
+Bug Rate    = 0%    →  Positive reinforcement; encourages stretch goals
+```
 
 ---
 
-## Tech Stack
+## 🗄️ Data Source
+
+All data is sourced from the provided workbook and pre-processed into a static JS module — functionally equivalent to a REST API. **One line change to go live.**
+
+**Tables used:**
+
+```
+Dim_Developers      ·  Fact_Jira_Issues      ·  Fact_Pull_Requests
+Fact_CI_Deployments ·  Fact_Bug_Reports
+```
+
+---
+
+## 🛠 Tech Stack
 
 | Layer | Choice | Why |
-|-------|--------|-----|
-| Frontend | React 18 + Vite | Fast DX, component-based |
-| Styling | Tailwind CSS | Utility-first, consistent spacing |
-| Charts | Recharts | Composable, React-native charts |
-| Icons | Lucide React | Clean, consistent icon set |
-| Fonts | Syne (display) + DM Sans (body) | Distinctive, readable |
-| Data | Static JS module (mock API) | Keeps scope focused; easy to swap to REST |
+|---|---|---|
+| **Frontend** | React 18 + Vite | Fast DX, component-based, hot reload |
+| **Styling** | Tailwind CSS | Utility-first, consistent spacing system |
+| **Charts** | Recharts | Composable, React-native, no canvas hacks |
+| **Icons** | Lucide React | Clean, consistent, tree-shakeable |
+| **Fonts** | Syne + DM Sans | Distinctive display + readable body |
+| **Data** | Static JS module | Focused scope; trivially swappable to REST |
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
 ```bash
 # Install dependencies
 npm install
 
-# Start dev server (localhost:3000)
+# Start dev server → localhost:3000
 npm run dev
 
 # Build for production
@@ -87,66 +145,55 @@ npm run build
 npm run preview
 ```
 
+> 💡 **Zero-install option:** Open `standalone.html` directly in any browser. No npm, no build step. Drops in and works.
+
 ---
 
-## Project Structure
+## 🗂 Project Structure
 
 ```
 devpulse/
-├── index.html               # Entry HTML with Google Fonts
-├── vite.config.js           # Vite + React plugin config
-├── tailwind.config.js       # Tailwind with custom fonts
-├── postcss.config.js        # PostCSS config
+├── index.html              ← Entry HTML with Google Fonts
+├── standalone.html         ← Zero-dependency single-file build
+├── vite.config.js          ← Vite + React plugin
+├── tailwind.config.js      ← Tailwind with custom fonts
 ├── package.json
 └── src/
-    ├── main.jsx             # React entry point
-    ├── App.jsx              # Root component + view routing
-    ├── index.css            # Global styles + Tailwind directives
+    ├── main.jsx            ← React entry point
+    ├── App.jsx             ← Root + view routing
+    ├── index.css           ← Global styles + Tailwind
     ├── data/
-    │   └── metrics.js       # All data + interpretation engine
+    │   └── metrics.js      ← All data + interpretation engine
     └── components/
-        ├── ICView.jsx       # Individual Contributor view
-        └── ManagerView.jsx  # Manager / team overview
+        ├── ICView.jsx       ← Individual Contributor view
+        └── ManagerView.jsx  ← Manager team overview
 ```
 
 ---
 
-## Interpretation Logic
+## ⚖️ Responsible Use
 
-The `interpretMetrics()` function in `src/data/metrics.js` maps metric values to human-readable stories:
+> DevPulse is built with an explicit responsible-use philosophy baked into both views.
 
-- **Cycle Time > 5.5d** → flags slow execution, suggests issue decomposition
-- **Lead Time > 4.5d** → flags pipeline delay, suggests proactive reviewer pings
-- **Bug Rate > 30%** → flags quality risk, suggests edge-case testing + pair review
-- **Bug Rate = 0** → positive reinforcement
-- **Pattern = healthy** → encourages stretch goals or mentoring
-
-Each developer is tagged with a pattern: `healthy`, `quality_watch`, or `needs_review` — derived from the workbook's `pattern_hint` column.
+- → Insights are **starting points for reflection**, not performance verdicts.
+- → Rankings are for **trend-spotting**, not ranking humans.
+- → Context — on-call load, team complexity, scope — **always matters.**
 
 ---
 
-## Responsible AI Use
+## 🗺️ Roadmap — *If I Had One More Week*
 
-This MVP includes explicit responsible-use notes in both IC and Manager views:
-- Insights are starting points for reflection, not performance verdicts
-- Rankings are for trend-spotting, not ranking humans
-- Context (on-call load, team complexity, scope) always matters
+| | Feature | Description |
+|---|---|---|
+| 🔌 | **Real Backend** | Node/Express or FastAPI — swap mock import for `fetch('/api/metrics')`. One line. |
+| 📅 | **6-Month Trends** | Historical arcs — see where a developer's been, not just where they are. |
+| 🔔 | **Slack Digests** | Weekly pattern summaries pushed directly to each developer's DM. |
+| 🚨 | **Anomaly Alerts** | Alert when any metric shifts >20% week-over-week. Catch drift early. |
 
 ---
 
-## Interview Talking Points
+<div align="center">
 
-**Why this scope?**  
-One focused IC journey + lightweight manager summary covers the core user problem without sprawl. Each view has a clear job: IC = self-awareness + action; Manager = team health + early spotting.
+Built by **Leona Goel** · [The ProductWorks.in](https://theproductworks.in) · DevPulse MVP · May 2026
 
-**Why static data layer?**  
-A `metrics.js` module is functionally equivalent to a REST `/api/metrics` endpoint. It's trivially replaceable — just swap `import` for `fetch`. This keeps the demo reliable and the focus on product thinking.
-
-**Biggest trade-off?**  
-With more time: real backend (Node/Express or FastAPI), live data via WebSocket, and a proper auth layer so each IC only sees their own data by default.
-
-**What I'd add next:**  
-- `/api/metrics` REST endpoint (Express or FastAPI)
-- Historical trend beyond 2 months
-- Slack/email digest integration (weekly pattern summary)
-- Anomaly detection: alert when any metric shifts >20% week-over-week
+</div>
